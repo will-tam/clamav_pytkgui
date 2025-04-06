@@ -21,6 +21,7 @@ from collections import OrderedDict as od
 
 # Third-part library import.
 import tkinter as tk
+import tkinter.filedialog
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 
@@ -50,8 +51,8 @@ IHM = od([
                    ])),
 ('analyses', od([('label', {'text': ""}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
-                   ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'class_addr': None}),
+                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'class_addr': None}),
+                   ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
                    ])),
 ('quit', od([('label', {'text': ""}),
                  ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'class_addr': None}),
@@ -242,7 +243,7 @@ class TKapp():
         self.design()
 
         self.rootterminal = tk.Toplevel()
-        self.rootterminal.title("ScrolledText Widget")
+        self.rootterminal.title("Output")
         self.terminal = ScrolledText(self.rootterminal, width=80,  height=25)
         button_temrinal = ttk.Button(self.rootterminal, text='Ok', compound=tk.RIGHT, command=self.rootterminal.withdraw, state=tk.NORMAL)
         self.terminal.config(fg="#F0F0F0", bg="#282C34", insertbackground="white")
@@ -265,8 +266,8 @@ class TKapp():
         IHM['update']['button1']['command'] = None
         IHM['update']['button2']['command'] = None
         IHM['analyses']['button1']['command'] = None
-        IHM['analyses']['button2']['command'] = None
-        IHM['analyses']['button3']['command'] = self.on_Analyses_btn
+        IHM['analyses']['button2']['command'] = self.on_Analyses_dir_btn
+        IHM['analyses']['button3']['command'] = None
         IHM['quit']['button1']['command'] = self.rootwin.destroy
 
     def design(self):
@@ -326,12 +327,16 @@ class TKapp():
         """
         self.rootwin.mainloop()
 
-    def on_Analyses_btn(self):
+    def on_Analyses_dir_btn(self):
         """
         """
-        IHM['analyses']['button3']['class_addr'].configure(state=tk.DISABLED)
+        dir_choose = tk.filedialog.askdirectory(title='Choose a directory', initialdir=os.getcwd())
+        IHM['analyses']['button2']['class_addr'].configure(state=tk.DISABLED)
         self.rootterminal.deiconify()
-        process_thread = Thread(target=run_clamscan, name='T_run_clamscan', args=[self, self.conf, os.sep])
+        self.terminal.configure(state=tk.NORMAL)
+        self.terminal.delete("1.0", "end")
+        self.terminal.configure(state=tk.DISABLED)
+        process_thread = Thread(target=run_clamscan, name='T_run_clamscan', args=[self, self.conf, dir_choose, 'button2'])
         process_thread.start()
 
     def on_Fr_btn(self):
@@ -378,22 +383,20 @@ class TerminalInfo(object):
         pass
 
 
-def run_clamscan(tk_app, conf, dir_to_scan):
+def run_clamscan(tk_app, conf, dir_to_scan, calling_btn):
     """
     """
-    dir_to_scan = "/home/will/data/programmation/python/clamav_pygui"
-    print("Scan from :", dir_to_scan)
     cde_line = [conf.confs['parameters']['clamscan_bin'], dir_to_scan]
 
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
-
+    print("Scan from :", dir_to_scan)
     with subprocess.Popen(cde_line, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True) as p:
         for line in p.stdout:
             print(line, end='')
-
     sys.stdout = sys.__stdout__
-    IHM['analyses']['button3']['class_addr'].configure(state=tk.NORMAL)
+
+    IHM['analyses'][calling_btn]['class_addr'].configure(state=tk.NORMAL)
 
 def main(args):
     """
@@ -427,4 +430,3 @@ def main(args):
 if __name__ == "__main__":
     rc = main(sys.argv[1:])      # Keep only the argus after the script name.
     sys.exit(rc)
-
