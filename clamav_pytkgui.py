@@ -232,7 +232,7 @@ class TKapp():
         @return : none.
         """
         self.conf = conf
-        self.lang = self.conf.confs['parameters']['lang'] if self.conf.confs['parameters']['lang'] != "auto" else locale.getdefaultlocale()[0]
+        self.lang = self.conf.confs['parameters']['lang'] if self.conf.confs['parameters']['lang'] != "auto" else locale.getlocale()[0]
         print(self.lang)
         self.rootwin = tk.Tk()
         IHM['language']['button1']['image'] = tk.PhotoImage(file=os.path.join(os.getcwd(), "fr.png")).zoom(2, 2).subsample(3, 3)
