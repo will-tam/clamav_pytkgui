@@ -31,9 +31,9 @@ from tkinter.scrolledtext import ScrolledText
 
 IHM = od([
 ('language', od([('label', {'text': "", 'widget_addr': None}),
-                 ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
-                 ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
-                 ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
+                 ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                 ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                 ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ])),
 ('parameters', od([('label', {'text': "", 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
@@ -51,11 +51,11 @@ IHM = od([
                    ])),
 ('analyses', od([('label', {'text': "", 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
+                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
 ('quit', od([('label', {'text': "", 'widget_addr': None}),
-                 ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
+                 ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ])),
 ])
 
@@ -138,6 +138,21 @@ labels = {
                       'button1': "Quit"
                       }
              },
+}
+
+win_titles = {
+'fr_FR': {'main': "clamAV Python3 TK GUI - Version faite rapidement",
+          'choose_dir': "Choisir un répertoire",
+          'choose_files': "Choisir un ou plusieurs fichiers",
+          'output': "Sortie de terminal"},
+'ja_JP': {'main': "clamAV Python3 TK GUI - 急に出たバーション",
+          'choose_dir': "ディレクトリを選択",
+          'choose_files': "ファイルを選択",
+          'output': "端末出力"},
+'C': {'main': "clamAV Python3 TK GUI - Quicky done version",
+      'choose_dir': "Choose a directory",
+      'choose_files': "Choose one or several file",
+      'output': "Terminal output"}
 }
 
 ######################
@@ -241,31 +256,10 @@ class TKapp():
         self.lang = self.conf.confs['parameters']['lang'] if self.conf.confs['parameters']['lang'] != "auto" else locale.getlocale()[0]
         print(self.lang)
         self.rootwin = tk.Tk()
+
         IHM['language']['button1']['image'] = tk.PhotoImage(file=os.path.join(os.getcwd(), "fr.png")).zoom(2, 2).subsample(3, 3)
         IHM['language']['button2']['image'] = tk.PhotoImage(file=os.path.join(os.getcwd(), "ja.png")).zoom(2, 2).subsample(3, 3)
         IHM['language']['button3']['image'] = tk.PhotoImage(file=os.path.join(os.getcwd(), "en.png")).zoom(2, 2).subsample(3, 3)
-        self.precise_command()
-        self.prepare_locale(self.lang)
-        self.design()
-
-        self.rootterminal = tk.Toplevel()
-        self.rootterminal.title("Output")
-        self.terminal = ScrolledText(self.rootterminal, width=80,  height=25)
-        button_temrinal = ttk.Button(self.rootterminal, text='Ok', compound=tk.RIGHT, command=self.hide_rootterminal, state=tk.NORMAL)
-        self.terminal.config(fg="#F0F0F0", bg="#282C34", insertbackground="white")
-        self.terminal.pack(padx = 10, pady=10,  fill=tk.BOTH, side=tk.TOP, expand=True)
-        button_temrinal.pack(side=tk.BOTTOM, pady=10)
-        self.rootterminal.withdraw()
-
-    def hide_rootterminal(self):
-        """
-        """
-        self.rootterminal.withdraw()
-        IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
-
-    def precise_command(self):
-        """
-        """
         IHM['language']['button1']['command'] = self.on_Fr_btn
         IHM['language']['button2']['command'] = self.on_Jp_btn
         IHM['language']['button3']['command'] = self.on_Uk_btn
@@ -277,10 +271,28 @@ class TKapp():
         IHM['history']['button2']['command'] = None
         IHM['update']['button1']['command'] = None
         IHM['update']['button2']['command'] = None
-        IHM['analyses']['button1']['command'] = None
+        IHM['analyses']['button1']['command'] = self.on_Analyses_file_btn
         IHM['analyses']['button2']['command'] = self.on_Analyses_dir_btn
         IHM['analyses']['button3']['command'] = None
         IHM['quit']['button1']['command'] = self.rootwin.destroy
+
+        self.rootterminal = tk.Toplevel()
+        self.rootterminal.title(win_titles[self.lang]['output'])
+        self.terminal = ScrolledText(self.rootterminal, width=80,  height=25)
+        button_temrinal = ttk.Button(self.rootterminal, text='Ok', compound=tk.RIGHT, command=self.hide_rootterminal, state=tk.NORMAL)
+        self.terminal.config(fg="#F0F0F0", bg="#282C34", insertbackground="white")
+        self.terminal.pack(padx = 10, pady=10,  fill=tk.BOTH, side=tk.TOP, expand=True)
+        button_temrinal.pack(side=tk.BOTTOM, pady=10)
+        self.rootterminal.withdraw()
+
+        self.prepare_locale(self.lang)
+        self.design()
+
+    def hide_rootterminal(self):
+        """
+        """
+        self.rootterminal.withdraw()
+        IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
 
     def design(self):
         """
@@ -293,7 +305,7 @@ class TKapp():
         center_y = int(screen_height/2 - window_height / 2)
         self.rootwin.minsize(window_width, window_height)
 
-        self.rootwin.title("clamAV Python3 TK GUI - Quicky done version")
+        self.rootwin.title(win_titles[self.lang]['main'])
         self.rootwin.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
         for k0 in IHM.keys():
@@ -308,6 +320,7 @@ class TKapp():
                     if IHM[k0][k1]['widget_addr'] == None:
                         IHM[k0][k1]['widget_addr'] = lblfrm
                 elif k1.startswith('button'):
+                    IHM[k0][k1]['state'] = tk.NORMAL if IHM[k0][k1]['command'] else tk.DISABLED
                     btn = ttk.Button(lblfrm, text=IHM[k0][k1]['text'], image=IHM[k0][k1]['image'], compound=tk.RIGHT, command=IHM[k0][k1]['command'], state=IHM[k0][k1]['state'])
                     if IHM[k0][k1]['widget_addr'] == None:
                         IHM[k0][k1]['widget_addr'] = btn
@@ -322,8 +335,13 @@ class TKapp():
             for k1 in IHM[k0].keys():
                 IHM[k0][k1]['widget_addr'].configure(text=IHM[k0][k1]['text'])
 
+        self.rootwin.title(win_titles[self.lang]['main'])
+        self.rootterminal.title(win_titles[self.lang]['output'])
+
     def prepare_locale(self, wanted_locale):
-        locales = {'fr_FR': 'labelsFR', 'C': 'labelsUK', 'ja_JP': 'labelsJP'}
+        """
+        """
+        locales = {'fr_FR': 'labelsFR', 'ja_JP': 'labelsJP', 'C': 'labelsUK'}
         for k0 in IHM.keys():
             for k1 in IHM[k0].keys():
                 IHM[k0][k1]['text'] = labels[locales[wanted_locale]][k0][k1]
@@ -337,17 +355,31 @@ class TKapp():
         """
         """
         IHM['analyses']['button2']['widget_addr'].configure(state=tk.DISABLED)
-        dir_choose = tk.filedialog.askdirectory(title='Choose a directory', initialdir=os.getcwd())
+        dir_choose = tk.filedialog.askdirectory(title=win_titles[self.lang]['choose_dir'], initialdir=os.getcwd())
         if dir_choose:
             self.rootterminal.deiconify()
             self.terminal.configure(state=tk.NORMAL)
             self.terminal.delete("1.0", "end")
             self.terminal.configure(state=tk.DISABLED)
-            process_thread = Thread(target=run_clamscan, name='T_run_clamscan', args=[self, self.conf, dir_choose, 'button2'])
+            process_thread = Thread(target=run_clamscan_dir, name='T_run_clamscan_dir', args=[self, self.conf, dir_choose])
             process_thread.start()
         else:
             IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
 
+    def on_Analyses_file_btn(self):
+        """
+        """
+        IHM['analyses']['button1']['widget_addr'].configure(state=tk.DISABLED)
+        files_choose = tk.filedialog.askopenfilename(title=win_titles[self.lang]['choose_files'], initialdir=os.getcwd(), multiple=True)
+        if files_choose:
+            self.rootterminal.deiconify()
+            self.terminal.configure(state=tk.NORMAL)
+            self.terminal.delete("1.0", "end")
+            self.terminal.configure(state=tk.DISABLED)
+            process_thread = Thread(target=run_clamscan_files, name='T_run_clamscan_files', args=[self, self.conf, files_choose])
+            process_thread.start()
+        else:
+            IHM['analyses']['button1']['widget_addr'].configure(state=tk.NORMAL)
 
     def on_Fr_btn(self):
         """
@@ -396,16 +428,33 @@ class TerminalInfo(object):
         self.textbox.see("end")
         self.textbox.configure(state=tk.DISABLED)
 
+    def flush(self):
+        """
+        Just need by TerminalInfo
+        """
+        pass
 
-def run_clamscan(tk_app, conf, dir_to_scan, calling_btn):
+def run_clamscan_dir(tk_app, conf, dir_to_scan):
     """
     """
     cde_line = [conf.confs['parameters']['clamscan_bin'], dir_to_scan]
-    cde_line = ['ls', '-ail', '/usr/bin']
 
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
-    print("Scan from :", dir_to_scan)
+    print(f"Scan from : {dir_to_scan}\n")
+    with subprocess.Popen(cde_line, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True) as p:
+        for line in p.stdout:
+            print(line, end='')
+    sys.stdout = sys.__stdout__
+
+def run_clamscan_files(tk_app, conf, files_to_scan):
+    """
+    """
+    cde_line = [conf.confs['parameters']['clamscan_bin']]
+    cde_line += files_to_scan
+    terminalinfo = TerminalInfo(tk_app.terminal)
+    sys.stdout = terminalinfo
+    print(f"Scan of : {files_to_scan}\n")
     with subprocess.Popen(cde_line, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True) as p:
         for line in p.stdout:
             print(line, end='')
