@@ -30,32 +30,32 @@ from tkinter.scrolledtext import ScrolledText
 ######################
 
 IHM = od([
-('language', od([('label', {'text': ""}),
-                 ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'class_addr': None}),
-                 ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'class_addr': None}),
-                 ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'class_addr': None}),
+('language', od([('label', {'text': "", 'widget_addr': None}),
+                 ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
+                 ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
+                 ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
                  ])),
-('parameters', od([('label', {'text': ""}),
-                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
-                   ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
-                   ('button4', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
+('parameters', od([('label', {'text': "", 'widget_addr': None}),
+                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('button4', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('history', od([('label', {'text': ""}),
-                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
+('history', od([('label', {'text': "", 'widget_addr': None}),
+                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('update', od([('label', {'text': ""}),
-                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
+('update', od([('label', {'text': "", 'widget_addr': None}),
+                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('analyses', od([('label', {'text': ""}),
-                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'class_addr': None}),
-                   ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'class_addr': None}),
+('analyses', od([('label', {'text': "", 'widget_addr': None}),
+                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
+                   ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('quit', od([('label', {'text': ""}),
-                 ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'class_addr': None}),
+('quit', od([('label', {'text': "", 'widget_addr': None}),
+                 ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.NORMAL, 'widget_addr': None}),
                  ])),
 ])
 
@@ -251,11 +251,17 @@ class TKapp():
         self.rootterminal = tk.Toplevel()
         self.rootterminal.title("Output")
         self.terminal = ScrolledText(self.rootterminal, width=80,  height=25)
-        button_temrinal = ttk.Button(self.rootterminal, text='Ok', compound=tk.RIGHT, command=self.rootterminal.withdraw, state=tk.NORMAL)
+        button_temrinal = ttk.Button(self.rootterminal, text='Ok', compound=tk.RIGHT, command=self.hide_rootterminal, state=tk.NORMAL)
         self.terminal.config(fg="#F0F0F0", bg="#282C34", insertbackground="white")
         self.terminal.pack(padx = 10, pady=10,  fill=tk.BOTH, side=tk.TOP, expand=True)
         button_temrinal.pack(side=tk.BOTTOM, pady=10)
         self.rootterminal.withdraw()
+
+    def hide_rootterminal(self):
+        """
+        """
+        self.rootterminal.withdraw()
+        IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
 
     def precise_command(self):
         """
@@ -290,37 +296,31 @@ class TKapp():
         self.rootwin.title("clamAV Python3 TK GUI - Quicky done version")
         self.rootwin.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
-        self.refresh()
-
-        self.rootwin.bind('<Escape>', lambda e: self.rootwin.destroy()) # TO REMOVE IN PROD
-
-    def refresh(self):
-        """
-        """
-        try:
-            for widget in self.widgets_text:
-                widget.destroy()
-            self.widgets_text = []
-        except:
-            self.widgets_text = []
-
         for k0 in IHM.keys():
             for k1 in IHM[k0].keys():
                 if k1 == 'label':
                     if k0 == 'quit':
                         lblfrm = ttk.Label(self.rootwin)
-                        self.widgets_text.append(lblfrm)
                         lblfrm.pack(expand='yes', fill=tk.BOTH, padx=10, pady=5)
                     else:
                         lblfrm = ttk.LabelFrame(self.rootwin, text=IHM[k0]['label']['text'])
-                        self.widgets_text.append(lblfrm)
                         lblfrm.pack(expand='yes', fill=tk.BOTH, padx=10, pady=5)
+                    if IHM[k0][k1]['widget_addr'] == None:
+                        IHM[k0][k1]['widget_addr'] = lblfrm
                 elif k1.startswith('button'):
                     btn = ttk.Button(lblfrm, text=IHM[k0][k1]['text'], image=IHM[k0][k1]['image'], compound=tk.RIGHT, command=IHM[k0][k1]['command'], state=IHM[k0][k1]['state'])
-                    self.widgets_text.append(btn)
-                    if IHM[k0][k1]['class_addr'] == None:
-                        IHM[k0][k1]['class_addr'] = btn
+                    if IHM[k0][k1]['widget_addr'] == None:
+                        IHM[k0][k1]['widget_addr'] = btn
                     btn.pack(side=tk.LEFT, padx=20, pady=20)
+
+        self.rootwin.bind('<Escape>', lambda e: self.rootwin.destroy()) # TO REMOVE IN PROD
+
+    def refresh_text(self, ):
+        """
+        """
+        for k0 in IHM.keys():
+            for k1 in IHM[k0].keys():
+                IHM[k0][k1]['widget_addr'].configure(text=IHM[k0][k1]['text'])
 
     def prepare_locale(self, wanted_locale):
         locales = {'fr_FR': 'labelsFR', 'C': 'labelsUK', 'ja_JP': 'labelsJP'}
@@ -336,35 +336,39 @@ class TKapp():
     def on_Analyses_dir_btn(self):
         """
         """
+        IHM['analyses']['button2']['widget_addr'].configure(state=tk.DISABLED)
         dir_choose = tk.filedialog.askdirectory(title='Choose a directory', initialdir=os.getcwd())
-        IHM['analyses']['button2']['class_addr'].configure(state=tk.DISABLED)
-        self.rootterminal.deiconify()
-        self.terminal.configure(state=tk.NORMAL)
-        self.terminal.delete("1.0", "end")
-        self.terminal.configure(state=tk.DISABLED)
-        process_thread = Thread(target=run_clamscan, name='T_run_clamscan', args=[self, self.conf, dir_choose, 'button2'])
-        process_thread.start()
+        if dir_choose:
+            self.rootterminal.deiconify()
+            self.terminal.configure(state=tk.NORMAL)
+            self.terminal.delete("1.0", "end")
+            self.terminal.configure(state=tk.DISABLED)
+            process_thread = Thread(target=run_clamscan, name='T_run_clamscan', args=[self, self.conf, dir_choose, 'button2'])
+            process_thread.start()
+        else:
+            IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
+
 
     def on_Fr_btn(self):
         """
         """
         self.lang = 'fr_FR'
         self.prepare_locale(self.lang)
-        self.refresh()
+        self.refresh_text()
 
     def on_Jp_btn(self):
         """
         """
         self.lang = 'ja_JP'
         self.prepare_locale(self.lang)
-        self.refresh()
+        self.refresh_text()
 
     def on_Uk_btn(self):
         """
         """
         self.lang = 'C'
         self.prepare_locale(self.lang)
-        self.refresh()
+        self.refresh_text()
 
 class TerminalInfo(object):
     """
@@ -377,23 +381,27 @@ class TerminalInfo(object):
 
     # Public methods.
     def __init__(self, textbox):
+        """
+        __init__ : initiate class
+        @parameters : ...
+        @return : none.
+        """
         self.textbox = textbox
 
     def write(self, text):
+        """
+        """
         self.textbox.configure(state=tk.NORMAL)
         self.textbox.insert("end", text)
         self.textbox.see("end")
         self.textbox.configure(state=tk.DISABLED)
-
-    def flush(self):
-        pass
 
 
 def run_clamscan(tk_app, conf, dir_to_scan, calling_btn):
     """
     """
     cde_line = [conf.confs['parameters']['clamscan_bin'], dir_to_scan]
-    cde_line = ['ls', '-ail']
+    cde_line = ['ls', '-ail', '/usr/bin']
 
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
@@ -402,8 +410,6 @@ def run_clamscan(tk_app, conf, dir_to_scan, calling_btn):
         for line in p.stdout:
             print(line, end='')
     sys.stdout = sys.__stdout__
-
-    IHM['analyses'][calling_btn]['class_addr'].configure(state=tk.NORMAL)
 
 def main(args):
     """
