@@ -180,10 +180,16 @@ class Config():
     def init_1st_conf(self):
         """
         """
+        clamscan_dirs = {
+        'linux': '/usr/bin/clamscan',
+        'win32': 'C:\Program File\ClamAV\clamscan.exe',
+        'default': ''
+        }
+
         default_confs = {
             'parameters': {
                 'lang': 'auto',
-                'clamscan_bin': 'clamscan'
+                'clamscan_bin': clamscan_dirs[self.os]
                           },
             'whitelist': {
                 'Do_no_scan_dirs': []
@@ -387,6 +393,7 @@ def run_clamscan(tk_app, conf, dir_to_scan, calling_btn):
     """
     """
     cde_line = [conf.confs['parameters']['clamscan_bin'], dir_to_scan]
+    cde_line = ['ls', '-ail']
 
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
