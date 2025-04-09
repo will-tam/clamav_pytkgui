@@ -174,15 +174,15 @@ class Config():
         @return : none.
         """
         conf_dirs = {
-        'linux': os.path.join(os.path.expanduser( '~' ), ".config", "clamAV_pygui"),
-        'win32': os.path.join(os.path.expanduser( '~' ), "", "clamAV_pygui"),
-        'default': os.path.join(os.path.expanduser( '~' ), "clamAV_pygui")
+        'linux': os.path.join(os.path.expanduser( '~' ), ".config", "clamav_pytkgui"),
+        'win32': os.path.join(os.path.expanduser( '~' ), "", "clamav_pytkgui"),
+        'default': os.path.join(os.path.expanduser( '~' ), "clamav_pytkgui")
         }
         self.os = sys.platform
         self.confs = configparser.ConfigParser()
 
         conf_dir = conf_dirs[self.os] if self.os in conf_dirs else conf_dirs["default"]
-        self.conf_file = os.path.join(conf_dir, 'clamAV_pygui.conf')
+        self.conf_file = os.path.join(conf_dir, 'clamav_pytkgui.conf')
         if not os.path.exists(conf_dir):
             os.mkdir(conf_dir)
         if not os.path.exists(self.conf_file) or reset_conf == True:
@@ -357,6 +357,7 @@ class TKapp():
         IHM['analyses']['button2']['widget_addr'].configure(state=tk.DISABLED)
         dir_choose = tk.filedialog.askdirectory(title=win_titles[self.lang]['choose_dir'], initialdir=os.getcwd())
         if dir_choose:
+            dir_choose = os.sep.join(dir_choose.split('/'))     # Because of Windows '\' directory separator portability.
             self.rootterminal.deiconify()
             self.terminal.configure(state=tk.NORMAL)
             self.terminal.delete("1.0", "end")
@@ -372,6 +373,7 @@ class TKapp():
         IHM['analyses']['button1']['widget_addr'].configure(state=tk.DISABLED)
         files_choose = tk.filedialog.askopenfilename(title=win_titles[self.lang]['choose_files'], initialdir=os.getcwd(), multiple=True)
         if files_choose:
+            files_choose = tuple([os.sep.join(file_choose.split('/')) for file_choose in files_choose])   # Because of Windows '\' directory separator portability.
             self.rootterminal.deiconify()
             self.terminal.configure(state=tk.NORMAL)
             self.terminal.delete("1.0", "end")
