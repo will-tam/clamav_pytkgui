@@ -197,7 +197,7 @@ class Config():
         """
         clamscan_dirs = {
         'linux': '/usr/bin/clamscan',
-        'win32': 'C:\Program File\ClamAV\clamscan.exe',
+        'win32': 'C:\Program Files\ClamAV\clamscan.exe',
         'default': ''
         }
 
@@ -476,7 +476,7 @@ def main(args):
     except BaseException as e:
         print(e)
         return 1
-    print(conf.os)
+    print(conf.os, flush=True)          # Because of Windows terminal.
     print(conf.conf_file)
 
     try:
