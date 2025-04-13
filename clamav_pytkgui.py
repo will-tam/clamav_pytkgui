@@ -195,6 +195,7 @@ class Config():
         if self.confs['parameters']['lang'] == "auto":
             self.confs['parameters']['lang'] = locale.getlocale()[0]
 
+        self.subproc = None
 
     def init_1st_conf(self):
         """
@@ -278,15 +279,15 @@ class TKapp(Config):
         IHM['analyses']['button1']['command'] = self.on_Analyses_file_btn
         IHM['analyses']['button2']['command'] = self.on_Analyses_dir_btn
         IHM['analyses']['button3']['command'] = None
-        IHM['quit']['button1']['command'] = self.rootwin.destroy
+        IHM['quit']['button1']['command'] = self.terminate
 
         self.rootterminal = tk.Toplevel()
         self.rootterminal.title(win_titles[self.confs['parameters']['lang']]['output'])
         self.terminal = ScrolledText(self.rootterminal, width=80,  height=25)
-        button_temrinal = ttk.Button(self.rootterminal, text='Ok', compound=tk.RIGHT, command=self.hide_rootterminal, state=tk.NORMAL)
+        button_terminal = ttk.Button(self.rootterminal, text='Ok', compound=tk.RIGHT, command=self.hide_rootterminal, state=tk.NORMAL)
         self.terminal.config(fg="#F0F0F0", bg="#282C34", insertbackground="white")
         self.terminal.pack(padx = 10, pady=10,  fill=tk.BOTH, side=tk.TOP, expand=True)
-        button_temrinal.pack(side=tk.BOTTOM, pady=10)
+        button_terminal.pack(side=tk.BOTTOM, pady=10)
         self.rootterminal.withdraw()
 
         self.prepare_locale(self.confs['parameters']['lang'])
@@ -295,6 +296,7 @@ class TKapp(Config):
     def hide_rootterminal(self):
         """
         """
+        self.subproc.terminate()
         self.rootterminal.withdraw()
         IHM['analyses']['button1']['widget_addr'].configure(state=tk.NORMAL)
         IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
@@ -331,7 +333,7 @@ class TKapp(Config):
                         IHM[k0][k1]['widget_addr'] = btn
                     btn.pack(side=tk.LEFT, padx=20, pady=20)
 
-        self.rootwin.bind('<Escape>', lambda e: self.rootwin.destroy()) # TO REMOVE IN PROD
+        self.rootwin.bind('<Escape>', lambda e: self.terminate()) # TO REMOVE IN PROD
 
     def refresh_text(self, ):
         """
@@ -355,6 +357,12 @@ class TKapp(Config):
         """
         """
         self.rootwin.mainloop()
+
+    def terminate(self):
+        """
+        """
+        self.subproc.terminate()
+        self.rootwin.destroy()
 
     def on_Analyses_dir_btn(self):
         """
@@ -452,6 +460,7 @@ def run_clamscan_dir(tk_app, clamscan_bin, dir_to_scan):
     sys.stdout = terminalinfo
     print(f"Scan from : {dir_to_scan}\n")
     with subprocess.Popen(cde_line, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True) as p:
+        tk_app.subproc = p
         for line in p.stdout:
             print(line, end='')
     sys.stdout = sys.__stdout__
@@ -465,6 +474,7 @@ def run_clamscan_files(tk_app, clamscan_bin, files_to_scan):
     sys.stdout = terminalinfo
     print(f"Scan of : {files_to_scan}\n")
     with subprocess.Popen(cde_line, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True) as p:
+        tk_app.subproc = p
         for line in p.stdout:
             print(line, end='')
     sys.stdout = sys.__stdout__
@@ -477,7 +487,6 @@ def main(args):
               ... = some problem occures.
     """
     reset = True if len(args) != 0 and args[0] == '--reset' else False
-
 
 #    try:
 #        app = TKapp(conf)
