@@ -192,6 +192,10 @@ class Config():
         else:
             self.read_conf()
 
+        if self.confs['parameters']['lang'] == "auto":
+            self.confs['parameters']['lang'] = locale.getlocale()[0]
+
+
     def init_1st_conf(self):
         """
         """
@@ -236,7 +240,7 @@ class Config():
         with open(self.conf_file, 'w') as conf_file_fd:
             self.confs.write(conf_file_fd)
 
-class TKapp():
+class TKapp(Config):
     """
 
     Public attributes.
@@ -246,15 +250,15 @@ class TKapp():
 
 
     # Public methods.
-    def __init__(self, conf):
+    def __init__(self, reset_conf=False):
         """
         __init__ : initiate class
         @parameters : ...
         @return : none.
         """
-        self.conf = conf
-        self.lang = self.conf.confs['parameters']['lang'] if self.conf.confs['parameters']['lang'] != "auto" else locale.getlocale()[0]
-        print(self.lang)
+
+        super().__init__(reset_conf)
+
         self.rootwin = tk.Tk()
 
         IHM['language']['button1']['image'] = tk.PhotoImage(file=os.path.join(os.getcwd(), "fr.png")).zoom(2, 2).subsample(3, 3)
@@ -277,7 +281,7 @@ class TKapp():
         IHM['quit']['button1']['command'] = self.rootwin.destroy
 
         self.rootterminal = tk.Toplevel()
-        self.rootterminal.title(win_titles[self.lang]['output'])
+        self.rootterminal.title(win_titles[self.confs['parameters']['lang']]['output'])
         self.terminal = ScrolledText(self.rootterminal, width=80,  height=25)
         button_temrinal = ttk.Button(self.rootterminal, text='Ok', compound=tk.RIGHT, command=self.hide_rootterminal, state=tk.NORMAL)
         self.terminal.config(fg="#F0F0F0", bg="#282C34", insertbackground="white")
@@ -285,13 +289,14 @@ class TKapp():
         button_temrinal.pack(side=tk.BOTTOM, pady=10)
         self.rootterminal.withdraw()
 
-        self.prepare_locale(self.lang)
+        self.prepare_locale(self.confs['parameters']['lang'])
         self.design()
 
     def hide_rootterminal(self):
         """
         """
         self.rootterminal.withdraw()
+        IHM['analyses']['button1']['widget_addr'].configure(state=tk.NORMAL)
         IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
 
     def design(self):
@@ -305,7 +310,7 @@ class TKapp():
         center_y = int(screen_height/2 - window_height / 2)
         self.rootwin.minsize(window_width, window_height)
 
-        self.rootwin.title(win_titles[self.lang]['main'])
+        self.rootwin.title(win_titles[self.confs['parameters']['lang']]['main'])
         self.rootwin.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
         for k0 in IHM.keys():
@@ -335,8 +340,8 @@ class TKapp():
             for k1 in IHM[k0].keys():
                 IHM[k0][k1]['widget_addr'].configure(text=IHM[k0][k1]['text'])
 
-        self.rootwin.title(win_titles[self.lang]['main'])
-        self.rootterminal.title(win_titles[self.lang]['output'])
+        self.rootwin.title(win_titles[self.confs['parameters']['lang']]['main'])
+        self.rootterminal.title(win_titles[self.confs['parameters']['lang']]['output'])
 
     def prepare_locale(self, wanted_locale):
         """
@@ -355,14 +360,14 @@ class TKapp():
         """
         """
         IHM['analyses']['button2']['widget_addr'].configure(state=tk.DISABLED)
-        dir_choose = tk.filedialog.askdirectory(title=win_titles[self.lang]['choose_dir'], initialdir=os.getcwd())
+        dir_choose = tk.filedialog.askdirectory(title=win_titles[self.confs['parameters']['lang']]['choose_dir'], initialdir=os.getcwd())
         if dir_choose:
             dir_choose = os.sep.join(dir_choose.split('/'))     # Because of Windows '\' directory separator portability.
             self.rootterminal.deiconify()
             self.terminal.configure(state=tk.NORMAL)
             self.terminal.delete("1.0", "end")
             self.terminal.configure(state=tk.DISABLED)
-            process_thread = Thread(target=run_clamscan_dir, name='T_run_clamscan_dir', args=[self, self.conf, dir_choose])
+            process_thread = Thread(target=run_clamscan_dir, name='T_run_clamscan_dir', args=[self, self.confs['parameters']['clamscan_bin'], dir_choose])
             process_thread.start()
         else:
             IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
@@ -371,38 +376,40 @@ class TKapp():
         """
         """
         IHM['analyses']['button1']['widget_addr'].configure(state=tk.DISABLED)
-        files_choose = tk.filedialog.askopenfilename(title=win_titles[self.lang]['choose_files'], initialdir=os.getcwd(), multiple=True)
+        files_choose = tk.filedialog.askopenfilename(title=win_titles[self.confs['parameters']['lang']]['choose_files'], initialdir=os.getcwd(), multiple=True)
         if files_choose:
             files_choose = tuple([os.sep.join(file_choose.split('/')) for file_choose in files_choose])   # Because of Windows '\' directory separator portability.
             self.rootterminal.deiconify()
             self.terminal.configure(state=tk.NORMAL)
             self.terminal.delete("1.0", "end")
             self.terminal.configure(state=tk.DISABLED)
-            process_thread = Thread(target=run_clamscan_files, name='T_run_clamscan_files', args=[self, self.conf, files_choose])
+            process_thread = Thread(target=run_clamscan_files, name='T_run_clamscan_files', args=[self, self.confs['parameters']['clamscan_bin'], files_choose])
             process_thread.start()
         else:
             IHM['analyses']['button1']['widget_addr'].configure(state=tk.NORMAL)
 
+    def change_lang(self, lang_is):
+        """
+        """
+        self.confs['parameters']['lang'] = lang_is
+        self.prepare_locale(self.confs['parameters']['lang'])
+        self.refresh_text()
+        self.write_conf()
+
     def on_Fr_btn(self):
         """
         """
-        self.lang = 'fr_FR'
-        self.prepare_locale(self.lang)
-        self.refresh_text()
+        self.change_lang('fr_FR')
 
     def on_Jp_btn(self):
         """
         """
-        self.lang = 'ja_JP'
-        self.prepare_locale(self.lang)
-        self.refresh_text()
+        self.change_lang('ja_JP')
 
     def on_Uk_btn(self):
         """
         """
-        self.lang = 'C'
-        self.prepare_locale(self.lang)
-        self.refresh_text()
+        self.change_lang('C')
 
 class TerminalInfo(object):
     """
@@ -436,10 +443,10 @@ class TerminalInfo(object):
         """
         pass
 
-def run_clamscan_dir(tk_app, conf, dir_to_scan):
+def run_clamscan_dir(tk_app, clamscan_bin, dir_to_scan):
     """
     """
-    cde_line = [conf.confs['parameters']['clamscan_bin'], dir_to_scan]
+    cde_line = [clamscan_bin, dir_to_scan]
 
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
@@ -449,10 +456,10 @@ def run_clamscan_dir(tk_app, conf, dir_to_scan):
             print(line, end='')
     sys.stdout = sys.__stdout__
 
-def run_clamscan_files(tk_app, conf, files_to_scan):
+def run_clamscan_files(tk_app, clamscan_bin, files_to_scan):
     """
     """
-    cde_line = [conf.confs['parameters']['clamscan_bin']]
+    cde_line = [clamscan_bin]
     cde_line += files_to_scan
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
@@ -471,21 +478,19 @@ def main(args):
     """
     reset = True if len(args) != 0 and args[0] == '--reset' else False
 
-    try:
-        conf = Config(reset)
-    except BaseException as e:
-        print(e)
-        return 1
-    print(conf.os, flush=True)          # Because of Windows terminal.
-    print(conf.conf_file)
 
-    try:
-        app = TKapp(conf)
-        app.run()
-    except BaseException as e:
-        print(sys.exc_info()[2].tb_lineno)
-        print(e)
-        return 2
+#    try:
+#        app = TKapp(conf)
+    app = TKapp(reset)
+    print(app.os, flush=True)          # Because of Windows terminal.
+    print(app.conf_file)
+    print(app.confs['parameters']['lang'])
+
+    app.run()
+#    except BaseException as e:
+#        print(sys.exc_info()[2].tb_lineno)
+#        print(e)
+#        return 1
 
     return 0
 
