@@ -35,19 +35,15 @@ IHM = od([
                  ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ])),
-('parameters', od([('label', {'text': "", 'widget_addr': None}),
+('clamscan_bin', od([('label', {'text': "", 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ('button4', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
 ('history', od([('label', {'text': "", 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('update', od([('label', {'text': "", 'widget_addr': None}),
+('white_list', od([('label', {'text': "", 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
 ('analyses', od([('label', {'text': "", 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
@@ -63,19 +59,15 @@ labels = {
 'labelsFR': {'language': {'label': "langage",
                           'button1': "Fr", 'button2': "Jp", 'button3': "Uk"
                          },
-             'parameters': {'label' : "Paramètres",
-                            'button1': "Paramètres",
-                            'button2': "Liste blanche",
-                            'button3': "Réseau",
-                            'button4': "Planificateur"
+             'clamscan_bin': {'label' : "Chemin de clamAV",
+                            'button1': "Choisir un chemin",
                             },
              'history': {'label': "Historique",
                          'button1': 'Historique',
                          'button2': 'Quarantaine'
                          },
-             'update': {'label': "Mise à jour",
-                        'button1': "Mise à jour",
-                        'button2': "Assistant de mise jour"
+             'white_list': {'label': "Liste blanche",
+                        'button1': "Choisir les fichiers à ne pas ananalyser",
                         },
              'analyses': {'label': "Analyses",
                           'button1': "Analyse d'un fichier",
@@ -89,19 +81,16 @@ labels = {
 'labelsJP': {'language': {'label': "言語",
                           'button1': "仏", 'button2': "日", 'button3': "英"
                           },
-             'parameters': {'label' : "パラメーター",
-                            'button1': "パラメーター",
-                            'button2': "認可リスト",
-                            'button3': "ネットワーク",
-                            'button4': "プランナー"
+             'clamscan_bin': {'label' : "ClamAVの道",
+                            'button1': "道を選択",
+                            'button2': "",
                             },
              'history': {'label': "歴史",
                          'button1': '歴史',
                          'button2': '隔離'
                          },
-             'update': {'label': "アプデート",
-                        'button1': "アプデート",
-                        'button2': "アプデート補佐"
+             'white_list': {'label': "認可リスト",
+                        'button1': "分析はしないファイルを選択",
                         },
              'analyses': {'label': "分析",
                           'button1': "ファイル分析",
@@ -115,19 +104,15 @@ labels = {
 'labelsUK': {'language': {'label': "language",
                           'button1': "Fr", 'button2': "Jp", 'button3': "Uk"
                          },
-             'parameters': {'label' : "Parameters",
-                            'button1': "Paramèters",
-                            'button2': "White list",
-                            'button3': "Network",
-                            'button4': "Scheduller"
+             'clamscan_bin': {'label' : "ClamAV path",
+                            'button1': "Choose a path",
                             },
              'history': {'label': "History",
                          'button1': 'History',
                          'button2': 'Quarantine'
                         },
-             'update': {'label': "Update",
-                        'button1': "Update",
-                        'button2': "Update assistant"
+             'white_list': {'label': "White list",
+                        'button1': "Choose file do not analysis",
                         },
              'analyses': {'label': "Analyses",
                           'button1': "File Analysis",
@@ -268,16 +253,12 @@ class TKapp(Config):
         IHM['language']['button1']['command'] = self.on_Fr_btn
         IHM['language']['button2']['command'] = self.on_Jp_btn
         IHM['language']['button3']['command'] = self.on_Uk_btn
-        IHM['parameters']['button1']['command'] = None
-        IHM['parameters']['button2']['command'] = None
-        IHM['parameters']['button3']['command'] = None
-        IHM['parameters']['button4']['command'] = None
+        IHM['clamscan_bin']['button1']['command'] = self.on_clamscan_bin_btn
         IHM['history']['button1']['command'] = None
         IHM['history']['button2']['command'] = None
-        IHM['update']['button1']['command'] = None
-        IHM['update']['button2']['command'] = None
-        IHM['analyses']['button1']['command'] = self.on_Analyses_file_btn
-        IHM['analyses']['button2']['command'] = self.on_Analyses_dir_btn
+        IHM['white_list']['button1']['command'] = None
+        IHM['analyses']['button1']['command'] = self.on_analyses_file_btn
+        IHM['analyses']['button2']['command'] = self.on_analyses_dir_btn
         IHM['analyses']['button3']['command'] = None
         IHM['quit']['button1']['command'] = self.terminate
 
@@ -332,6 +313,12 @@ class TKapp(Config):
                     if IHM[k0][k1]['widget_addr'] == None:
                         IHM[k0][k1]['widget_addr'] = btn
                     btn.pack(side=tk.LEFT, padx=20, pady=20)
+            if k0 == "clamscan_bin":
+                clamscan_bin_frame = ttk.Frame(lblfrm, borderwidth=1, relief=tk.SOLID)
+                clamscan_bin_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH, padx=20, pady=10)
+                self.clamscan_bin_label = ttk.Label(clamscan_bin_frame, text=self.confs['parameters']['clamscan_bin'])
+                self.clamscan_bin_label.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=10)
+
 
         self.rootwin.bind('<Escape>', lambda e: self.terminate()) # TO REMOVE IN PROD
 
@@ -361,10 +348,26 @@ class TKapp(Config):
     def terminate(self):
         """
         """
-        self.subproc.terminate()
+        if self.subproc:
+            self.subproc.terminate()
         self.rootwin.destroy()
 
-    def on_Analyses_dir_btn(self):
+    def on_clamscan_bin_btn(self):
+        """
+        self.confs['parameters']['clamscan_bin']
+        """
+        IHM['clamscan_bin']['button1']['widget_addr'].configure(state=tk.DISABLED)
+        file_choose = tk.filedialog.askopenfilename(title=win_titles[self.confs['parameters']['lang']]['choose_files'], initialdir=self.confs['parameters']['clamscan_bin'])
+        if file_choose:
+            self.confs['parameters']['clamscan_bin'] = file_choose
+            self.clamscan_bin_label['text'] = file_choose
+            self.write_conf()
+            IHM['clamscan_bin']['button1']['widget_addr'].configure(state=tk.NORMAL)
+        else:
+            IHM['clamscan_bin']['button1']['widget_addr'].configure(state=tk.NORMAL)
+
+
+    def on_analyses_dir_btn(self):
         """
         """
         IHM['analyses']['button2']['widget_addr'].configure(state=tk.DISABLED)
@@ -380,7 +383,7 @@ class TKapp(Config):
         else:
             IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
 
-    def on_Analyses_file_btn(self):
+    def on_analyses_file_btn(self):
         """
         """
         IHM['analyses']['button1']['widget_addr'].configure(state=tk.DISABLED)
