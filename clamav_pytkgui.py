@@ -16,6 +16,7 @@ import os
 import locale
 import configparser
 import subprocess
+import datetime
 from threading import Thread
 from collections import OrderedDict as od
 
@@ -30,27 +31,27 @@ from tkinter.scrolledtext import ScrolledText
 ######################
 
 IHM = od([
-('language', od([('label', {'text': "", 'widget_addr': None}),
+('language', od([('label', {'text': '', 'widget_addr': None}),
                  ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ])),
-('clamscan_bin', od([('label', {'text': "", 'widget_addr': None}),
+('clamscan_bin', od([('label', {'text': '', 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('history', od([('label', {'text': "", 'widget_addr': None}),
-                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ])),
-('white_list', od([('label', {'text': "", 'widget_addr': None}),
-                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ])),
-('analyses', od([('label', {'text': "", 'widget_addr': None}),
+('history', od([('label', {'text': '', 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('quit', od([('label', {'text': "", 'widget_addr': None}),
+('white_list', od([('label', {'text': '', 'widget_addr': None}),
+                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ])),
+('analyses', od([('label', {'text': '', 'widget_addr': None}),
+                   ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('virus_db_label', {'text': '', 'widget_addr': None})
+                   ])),
+('quit', od([('label', {'text': '', 'widget_addr': None}),
                  ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ])),
 ])
@@ -72,7 +73,8 @@ labels = {
              'analyses': {'label': "Analyses",
                           'button1': "Analyse d'un fichier",
                           'button2': "Analyse d'un répertoire",
-                          'button3': "Analyses"
+                          'virus_db_OK': "BdD virus <= 7 jours - OK",
+                          'virus_db_WARN': "BdD virus > 7 jours - Faire la mise à jour",
                           },
              'quit': {'label': "",
                       'button1': "Sortir"
@@ -95,7 +97,8 @@ labels = {
              'analyses': {'label': "分析",
                           'button1': "ファイル分析",
                           'button2': "ティレクトリー分析",
-                          'button3': "分析"
+                          'virus_db_OK': "ウイルスデータベース <= ７日 - OK",
+                          'virus_db_WARN': "ウイルスデータベース > ７日 - アップデートご注意",
                           },
              'quit': {'label': "",
                       'button1': "終"
@@ -117,7 +120,8 @@ labels = {
              'analyses': {'label': "Analyses",
                           'button1': "File Analysis",
                           'button2': "Directory Analysis",
-                          'button3': "Analyses"
+                          'virus_db_OK': "Virus DB <= 7 days - OK",
+                          'virus_db_WARN': "Virus DB > 7 days - Make update",
                           },
              'quit': {'label': "",
                       'button1': "Quit"
@@ -226,7 +230,7 @@ class Config():
         with open(self.conf_file, 'w') as conf_file_fd:
             self.confs.write(conf_file_fd)
 
-class TKapp(Config):
+class Clamav_utils():
     """
 
     Public attributes.
@@ -243,7 +247,27 @@ class TKapp(Config):
         @return : none.
         """
 
-        super().__init__(reset_conf)
+class Clamav_pytkgui(Config, Clamav_utils):
+    """
+
+    Public attributes.
+    """
+
+    # Private attributes.
+
+
+    # Public methods.
+    def __init__(self, reset_conf=False):
+        """
+        __init__ : initiate class
+        @parameters : ...
+        @return : none.
+        """
+
+        Config.__init__(self, reset_conf)
+        Clamav_utils.__init__(self)
+
+        self.virus_db_is_old = False if check_virus_db() < 8 else True
 
         self.rootwin = tk.Tk()
 
@@ -259,7 +283,6 @@ class TKapp(Config):
         IHM['white_list']['button1']['command'] = None
         IHM['analyses']['button1']['command'] = self.on_analyses_file_btn
         IHM['analyses']['button2']['command'] = self.on_analyses_dir_btn
-        IHM['analyses']['button3']['command'] = None
         IHM['quit']['button1']['command'] = self.terminate
 
         self.rootterminal = tk.Toplevel()
@@ -318,7 +341,13 @@ class TKapp(Config):
                 clamscan_bin_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH, padx=20, pady=10)
                 self.clamscan_bin_label = ttk.Label(clamscan_bin_frame, text=self.confs['parameters']['clamscan_bin'])
                 self.clamscan_bin_label.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=10)
-
+            if k0 == "analyses":
+                bg_color = "orange" if self.virus_db_is_old else "green"
+                virus_db_frame = tk.Frame(lblfrm, bg=bg_color, borderwidth=1, relief=tk.SOLID)
+                virus_db_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH, padx=20, pady=10)
+                self.virus_db_label = tk.Label(virus_db_frame, bg=bg_color, text=IHM[k0]['virus_db_label']['text'])
+                self.virus_db_label.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=10)
+                IHM[k0]['virus_db_label']['widget_addr'] = self.virus_db_label
 
         self.rootwin.bind('<Escape>', lambda e: self.terminate()) # TO REMOVE IN PROD
 
@@ -338,7 +367,13 @@ class TKapp(Config):
         locales = {'fr_FR': 'labelsFR', 'ja_JP': 'labelsJP', 'C': 'labelsUK'}
         for k0 in IHM.keys():
             for k1 in IHM[k0].keys():
-                IHM[k0][k1]['text'] = labels[locales[wanted_locale]][k0][k1]
+                if k1 is 'virus_db_label':
+                    if self.virus_db_is_old:
+                        IHM[k0][k1]['text'] = labels[locales[wanted_locale]]['analyses']['virus_db_WARN']
+                    else:
+                        IHM[k0][k1]['text'] = labels[locales[wanted_locale]]['analyses']['virus_db_OK']
+                else:
+                    IHM[k0][k1]['text'] = labels[locales[wanted_locale]][k0][k1]
 
     def run(self):
         """
@@ -365,7 +400,6 @@ class TKapp(Config):
             IHM['clamscan_bin']['button1']['widget_addr'].configure(state=tk.NORMAL)
         else:
             IHM['clamscan_bin']['button1']['widget_addr'].configure(state=tk.NORMAL)
-
 
     def on_analyses_dir_btn(self):
         """
@@ -454,6 +488,16 @@ class TerminalInfo(object):
         """
         pass
 
+def check_virus_db():
+    """
+    """
+    cde_line = ['clamscan', '--version']
+    rsl = subprocess.run(cde_line, capture_output=True)
+    date_last_db_virus = rsl.stdout.decode("utf-8").split("/")[2].strip()
+    date_last_db_virus = datetime.datetime.date(datetime.datetime.strptime(date_last_db_virus, "%c"))
+    date_today = datetime.datetime.date(datetime.datetime.now())
+    return (date_today - date_last_db_virus).days
+
 def run_clamscan_dir(tk_app, clamscan_bin, dir_to_scan):
     """
     """
@@ -491,7 +535,8 @@ def main(args):
 
 #    try:
 #        app = TKapp(conf)
-    app = TKapp(reset)
+    app = Clamav_pytkgui(reset)
+
     print(app.os, flush=True)          # Because of Windows terminal.
     print(app.conf_file)
     print(app.confs['parameters']['lang'])
