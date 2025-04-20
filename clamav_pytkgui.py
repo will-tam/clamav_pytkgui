@@ -461,7 +461,6 @@ def run_clamscan_dir(tk_app, clamscan_bin, dir_to_scan):
 
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
-    print(f"Scan from : {dir_to_scan}\n")
     with subprocess.Popen(cde_line, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True) as p:
         tk_app.subproc = p
         for line in p.stdout:
@@ -475,7 +474,6 @@ def run_clamscan_files(tk_app, clamscan_bin, files_to_scan):
     cde_line += files_to_scan
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
-    print(f"Scan of : {files_to_scan}\n")
     with subprocess.Popen(cde_line, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True) as p:
         tk_app.subproc = p
         for line in p.stdout:
