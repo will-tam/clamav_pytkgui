@@ -31,99 +31,102 @@ from tkinter.scrolledtext import ScrolledText
 ######################
 
 IHM = od([
-('language', od([('label', {'text': '', 'widget_addr': None}),
+('language', od([('framelabel', {'text': '', 'widget_addr': None}),
                  ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ])),
-('clamscan_bin', od([('label', {'text': '', 'widget_addr': None}),
+('clamscan_bin', od([('framelabel', {'text': '', 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('history', od([('label', {'text': '', 'widget_addr': None}),
+('history', od([('framelabel', {'text': '', 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('white_list', od([('label', {'text': '', 'widget_addr': None}),
+('white_list', od([('framelabel', {'text': '', 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
-('analyses', od([('label', {'text': '', 'widget_addr': None}),
+('analyses', od([('framelabel', {'text': '', 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ('virus_db_label', {'text': '', 'widget_addr': None})
                    ])),
-('quit', od([('label', {'text': '', 'widget_addr': None}),
+('quit', od([('framelabel', {'text': '', 'widget_addr': None}),
                  ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                  ])),
 ])
 
 labels = {
-'labelsFR': {'language': {'label': "langage",
+'labelsFR': {'language': {'framelabel': "langage",
                           'button1': "Fr", 'button2': "Jp", 'button3': "Uk"
                          },
-             'clamscan_bin': {'label' : "Chemin de clamAV",
-                            'button1': "Choisir un chemin",
+             'clamscan_bin': {'framelabel' : "Chemin de clamAV",
+                            'button1': "Chemin de l'exécutable",
                             },
-             'history': {'label': "Historique",
+             'history': {'framelabel': "Historique",
                          'button1': 'Historique',
-                         'button2': 'Quarantaine'
+                         'button2': 'Quarantaine',
+                         'button3': "Chemin des logs",
                          },
-             'white_list': {'label': "Liste blanche",
+             'white_list': {'framelabel': "Liste blanche",
                         'button1': "Choisir les fichiers à ne pas ananalyser",
                         },
-             'analyses': {'label': "Analyses",
+             'analyses': {'framelabel': "Analyses",
                           'button1': "Analyse d'un fichier",
                           'button2': "Analyse d'un répertoire",
                           'virus_db_OK': "BdD virus <= 7 jours - OK",
                           'virus_db_WARN': "BdD virus > 7 jours - Faire la mise à jour",
                           },
-             'quit': {'label': "",
+             'quit': {'framelabel': "",
                       'button1': "Sortir"
                       }
             },
-'labelsJP': {'language': {'label': "言語",
+'labelsJP': {'language': {'framelabel': "言語",
                           'button1': "仏", 'button2': "日", 'button3': "英"
                           },
-             'clamscan_bin': {'label' : "ClamAVの道",
-                            'button1': "道を選択",
-                            'button2': "",
+             'clamscan_bin': {'framelabel' : "ClamAVの道",
+                            'button1': "実行ファイル道",
                             },
-             'history': {'label': "歴史",
+             'history': {'framelabel': "歴史",
                          'button1': '歴史',
-                         'button2': '隔離'
+                         'button2': '隔離',
+                         'button3': "ローグ道",
                          },
-             'white_list': {'label': "認可リスト",
+             'white_list': {'framelabel': "認可リスト",
                         'button1': "分析はしないファイルを選択",
                         },
-             'analyses': {'label': "分析",
+             'analyses': {'framelabel': "分析",
                           'button1': "ファイル分析",
                           'button2': "ティレクトリー分析",
                           'virus_db_OK': "ウイルスデータベース <= ７日 - OK",
                           'virus_db_WARN': "ウイルスデータベース > ７日 - アップデートご注意",
                           },
-             'quit': {'label': "",
+             'quit': {'framelabel': "",
                       'button1': "終"
                       }
              },
-'labelsUK': {'language': {'label': "language",
+'labelsUK': {'language': {'framelabel': "language",
                           'button1': "Fr", 'button2': "Jp", 'button3': "Uk"
                          },
-             'clamscan_bin': {'label' : "ClamAV path",
-                            'button1': "Choose a path",
+             'clamscan_bin': {'framelabel' : "ClamAV path",
+                            'button1': "Executable path",
                             },
-             'history': {'label': "History",
+             'history': {'framelabel': "History",
                          'button1': 'History',
-                         'button2': 'Quarantine'
+                         'button2': 'Quarantine',
+                         'button3': "Logs path",
                         },
-             'white_list': {'label': "White list",
+             'white_list': {'framelabel': "White list",
                         'button1': "Choose file do not analysis",
                         },
-             'analyses': {'label': "Analyses",
+             'analyses': {'framelabel': "Analyses",
                           'button1': "File Analysis",
                           'button2': "Directory Analysis",
                           'virus_db_OK': "Virus DB <= 7 days - OK",
                           'virus_db_WARN': "Virus DB > 7 days - Make update",
                           },
-             'quit': {'label': "",
+             'quit': {'framelabel': "",
                       'button1': "Quit"
                       }
              },
@@ -198,22 +201,12 @@ class Config():
         default_confs = {
             'parameters': {
                 'lang': 'auto',
-                'clamscan_bin': clamscan_dirs[self.os]
+                'clamscan_bin': clamscan_dirs[self.os],
+                'clamscan_logs': clamscan_dirs[self.os]
                           },
             'whitelist': {
                 'Do_no_scan_dirs': []
                          },
-            'network': {
-                'proxy': 'None',
-                'IP_host': '',
-                'port': 8080
-                       },
-            'scheduler': {
-                'analysis_hour': 00,
-                'analysis_min': 00,
-                'update_sign_hour': 00,
-                'update_sign_min': 00,
-                         }
                 }
 
         for c, v in default_confs.items():
@@ -280,6 +273,7 @@ class Clamav_pytkgui(Config, Clamav_utils):
         IHM['clamscan_bin']['button1']['command'] = self.on_clamscan_bin_btn
         IHM['history']['button1']['command'] = None
         IHM['history']['button2']['command'] = None
+        IHM['history']['button3']['command'] = self.on_history_clamscan_logs_btn
         IHM['white_list']['button1']['command'] = None
         IHM['analyses']['button1']['command'] = self.on_analyses_file_btn
         IHM['analyses']['button2']['command'] = self.on_analyses_dir_btn
@@ -319,44 +313,49 @@ class Clamav_pytkgui(Config, Clamav_utils):
         self.rootwin.title(win_titles[self.confs['parameters']['lang']]['main'])
         self.rootwin.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
-        for k0 in IHM.keys():
-            for k1 in IHM[k0].keys():
-                if k1 == 'label':
-                    if k0 == 'quit':
+        self.rootwin.bind('<Escape>', lambda e: self.terminate()) # TO REMOVE IN PROD
+
+        for frmlbl in IHM.keys():
+            for widget in IHM[frmlbl].keys():
+                if widget == 'framelabel':
+                    if frmlbl == 'quit':
                         lblfrm = ttk.Label(self.rootwin)
                         lblfrm.pack(expand='yes', fill=tk.BOTH, padx=10, pady=5)
                     else:
-                        lblfrm = ttk.LabelFrame(self.rootwin, text=IHM[k0]['label']['text'])
+                        lblfrm = ttk.LabelFrame(self.rootwin, text=IHM[frmlbl]['framelabel']['text'])
                         lblfrm.pack(expand='yes', fill=tk.BOTH, padx=10, pady=5)
-                    if IHM[k0][k1]['widget_addr'] == None:
-                        IHM[k0][k1]['widget_addr'] = lblfrm
-                elif k1.startswith('button'):
-                    IHM[k0][k1]['state'] = tk.NORMAL if IHM[k0][k1]['command'] else tk.DISABLED
-                    btn = ttk.Button(lblfrm, text=IHM[k0][k1]['text'], image=IHM[k0][k1]['image'], compound=tk.RIGHT, command=IHM[k0][k1]['command'], state=IHM[k0][k1]['state'])
-                    if IHM[k0][k1]['widget_addr'] == None:
-                        IHM[k0][k1]['widget_addr'] = btn
+                    if IHM[frmlbl][widget]['widget_addr'] == None:
+                        IHM[frmlbl][widget]['widget_addr'] = lblfrm
+                elif widget.startswith('button'):
+                    IHM[frmlbl][widget]['state'] = tk.NORMAL if IHM[frmlbl][widget]['command'] else tk.DISABLED
+                    btn = ttk.Button(lblfrm, text=IHM[frmlbl][widget]['text'], image=IHM[frmlbl][widget]['image'], compound=tk.RIGHT, command=IHM[frmlbl][widget]['command'], state=IHM[frmlbl][widget]['state'])
+                    if IHM[frmlbl][widget]['widget_addr'] == None:
+                        IHM[frmlbl][widget]['widget_addr'] = btn
                     btn.pack(side=tk.LEFT, padx=20, pady=20)
-            if k0 == "clamscan_bin":
+            if frmlbl == "clamscan_bin":
                 clamscan_bin_frame = ttk.Frame(lblfrm, borderwidth=1, relief=tk.SOLID)
                 clamscan_bin_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH, padx=20, pady=10)
                 self.clamscan_bin_label = ttk.Label(clamscan_bin_frame, text=self.confs['parameters']['clamscan_bin'])
                 self.clamscan_bin_label.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=10)
-            if k0 == "analyses":
+            if frmlbl == "history":
+                history_log_frame = ttk.Frame(lblfrm, borderwidth=1, relief=tk.SOLID)
+                history_log_frame.pack(side=tk.BOTTOM, expand=True, fill=tk.BOTH, padx=20, pady=10)
+                self.history_log_label = ttk.Label(history_log_frame, text=self.confs['parameters']['clamscan_logs'])
+                self.history_log_label.pack(side=tk.BOTTOM, expand=True, fill=tk.X, padx=10)
+            if frmlbl == "analyses":
                 bg_color = "orange" if self.virus_db_is_old else "green"
                 virus_db_frame = tk.Frame(lblfrm, bg=bg_color, borderwidth=1, relief=tk.SOLID)
                 virus_db_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH, padx=20, pady=10)
-                self.virus_db_label = tk.Label(virus_db_frame, bg=bg_color, text=IHM[k0]['virus_db_label']['text'])
+                self.virus_db_label = tk.Label(virus_db_frame, bg=bg_color, text=IHM[frmlbl]['virus_db_label']['text'])
                 self.virus_db_label.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=10)
-                IHM[k0]['virus_db_label']['widget_addr'] = self.virus_db_label
-
-        self.rootwin.bind('<Escape>', lambda e: self.terminate()) # TO REMOVE IN PROD
+                IHM[frmlbl]['virus_db_label']['widget_addr'] = self.virus_db_label
 
     def refresh_text(self, ):
         """
         """
-        for k0 in IHM.keys():
-            for k1 in IHM[k0].keys():
-                IHM[k0][k1]['widget_addr'].configure(text=IHM[k0][k1]['text'])
+        for frmlbl in IHM.keys():
+            for widget in IHM[frmlbl].keys():
+                IHM[frmlbl][widget]['widget_addr'].configure(text=IHM[frmlbl][widget]['text'])
 
         self.rootwin.title(win_titles[self.confs['parameters']['lang']]['main'])
         self.rootterminal.title(win_titles[self.confs['parameters']['lang']]['output'])
@@ -365,15 +364,15 @@ class Clamav_pytkgui(Config, Clamav_utils):
         """
         """
         locales = {'fr_FR': 'labelsFR', 'ja_JP': 'labelsJP', 'C': 'labelsUK'}
-        for k0 in IHM.keys():
-            for k1 in IHM[k0].keys():
-                if k1 is 'virus_db_label':
+        for frmlbl in IHM.keys():
+            for widget in IHM[frmlbl].keys():
+                if widget is 'virus_db_label':
                     if self.virus_db_is_old:
-                        IHM[k0][k1]['text'] = labels[locales[wanted_locale]]['analyses']['virus_db_WARN']
+                        IHM[frmlbl][widget]['text'] = labels[locales[wanted_locale]]['analyses']['virus_db_WARN']
                     else:
-                        IHM[k0][k1]['text'] = labels[locales[wanted_locale]]['analyses']['virus_db_OK']
+                        IHM[frmlbl][widget]['text'] = labels[locales[wanted_locale]]['analyses']['virus_db_OK']
                 else:
-                    IHM[k0][k1]['text'] = labels[locales[wanted_locale]][k0][k1]
+                    IHM[frmlbl][widget]['text'] = labels[locales[wanted_locale]][frmlbl][widget]
 
     def run(self):
         """
@@ -386,6 +385,22 @@ class Clamav_pytkgui(Config, Clamav_utils):
         if self.subproc:
             self.subproc.terminate()
         self.rootwin.destroy()
+
+    def on_history_clamscan_logs_btn(self):
+        """
+        self.confs['parameters']['clamscan_logs']
+        """
+        IHM['history']['button3']['widget_addr'].configure(state=tk.DISABLED)
+        print(self.confs['parameters']['clamscan_logs'])
+        dir_choose = tk.filedialog.askdirectory(title=win_titles[self.confs['parameters']['lang']]['choose_dir'], initialdir=self.confs['parameters']['clamscan_logs'])
+        if dir_choose:
+            self.confs['parameters']['clamscan_logs'] = dir_choose
+            self.history_log_label['text'] = dir_choose
+            self.write_conf()
+            IHM['history']['button3']['widget_addr'].configure(state=tk.NORMAL)
+        else:
+            IHM['history']['button3']['widget_addr'].configure(state=tk.NORMAL)
+
 
     def on_clamscan_bin_btn(self):
         """
