@@ -271,7 +271,7 @@ class Clamav_pytkgui(Config, Clamav_utils):
         IHM['language']['button2']['command'] = self.on_Jp_btn
         IHM['language']['button3']['command'] = self.on_Uk_btn
         IHM['clamscan_bin']['button1']['command'] = self.on_clamscan_bin_btn
-        IHM['history']['button1']['command'] = None
+        IHM['history']['button1']['command'] = self.on_history_btn
         IHM['history']['button2']['command'] = None
         IHM['history']['button3']['command'] = self.on_history_clamscan_logs_btn
         IHM['white_list']['button1']['command'] = None
@@ -294,7 +294,8 @@ class Clamav_pytkgui(Config, Clamav_utils):
     def hide_rootterminal(self):
         """
         """
-        self.subproc.terminate()
+        if self.subproc:
+            self.subproc.terminate()
         self.rootterminal.withdraw()
         IHM['analyses']['button1']['widget_addr'].configure(state=tk.NORMAL)
         IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
@@ -386,35 +387,44 @@ class Clamav_pytkgui(Config, Clamav_utils):
             self.subproc.terminate()
         self.rootwin.destroy()
 
+    def on_history_btn(self):
+        """
+        """
+        file_choose = tk.filedialog.askopenfile(mode='r', title=win_titles[self.confs['parameters']['lang']]['choose_files'], initialdir=self.confs['parameters']['clamscan_logs'])
+        if file_choose:
+            self.rootterminal.deiconify()
+            self.terminal.configure(state=tk.NORMAL)
+            self.terminal.delete("1.0", tk.END)
+            for l in file_choose:
+                self.terminal.insert
+                self.terminal.insert(tk.END, l)
+            file_choose.close()
+            self.terminal.see("end")
+            self.terminal.configure(state=tk.DISABLED)
+
     def on_history_clamscan_logs_btn(self):
         """
         self.confs['parameters']['clamscan_logs']
         """
         IHM['history']['button3']['widget_addr'].configure(state=tk.DISABLED)
-        print(self.confs['parameters']['clamscan_logs'])
         dir_choose = tk.filedialog.askdirectory(title=win_titles[self.confs['parameters']['lang']]['choose_dir'], initialdir=self.confs['parameters']['clamscan_logs'])
         if dir_choose:
             self.confs['parameters']['clamscan_logs'] = dir_choose
             self.history_log_label['text'] = dir_choose
             self.write_conf()
-            IHM['history']['button3']['widget_addr'].configure(state=tk.NORMAL)
-        else:
-            IHM['history']['button3']['widget_addr'].configure(state=tk.NORMAL)
-
+        IHM['history']['button3']['widget_addr'].configure(state=tk.NORMAL)
 
     def on_clamscan_bin_btn(self):
         """
         self.confs['parameters']['clamscan_bin']
         """
         IHM['clamscan_bin']['button1']['widget_addr'].configure(state=tk.DISABLED)
-        file_choose = tk.filedialog.askopenfilename(title=win_titles[self.confs['parameters']['lang']]['choose_files'], initialdir=self.confs['parameters']['clamscan_bin'])
+        file_choose = tk.filedialog.askfilename(title=win_titles[self.confs['parameters']['lang']]['choose_files'], initialdir=os.path.dirname(self.confs['parameters']['clamscan_bin']))
         if file_choose:
             self.confs['parameters']['clamscan_bin'] = file_choose
             self.clamscan_bin_label['text'] = file_choose
             self.write_conf()
-            IHM['clamscan_bin']['button1']['widget_addr'].configure(state=tk.NORMAL)
-        else:
-            IHM['clamscan_bin']['button1']['widget_addr'].configure(state=tk.NORMAL)
+        IHM['clamscan_bin']['button1']['widget_addr'].configure(state=tk.NORMAL)
 
     def on_analyses_dir_btn(self):
         """
@@ -425,9 +435,9 @@ class Clamav_pytkgui(Config, Clamav_utils):
             dir_choose = os.sep.join(dir_choose.split('/'))     # Because of Windows '\' directory separator portability.
             self.rootterminal.deiconify()
             self.terminal.configure(state=tk.NORMAL)
-            self.terminal.delete("1.0", "end")
+            self.terminal.delete("1.0", tk.END)
             self.terminal.configure(state=tk.DISABLED)
-            process_thread = Thread(target=run_clamscan_dir, name='T_run_clamscan_dir', args=[self, self.confs['parameters']['clamscan_bin'], dir_choose])
+            process_thread = Thread(target=run_clamscan_dir, name='T_run_clamscan_dir', args=[self, self.confs['parameters']['clamscan_bin'], self.confs['parameters']['clamscan_logs'], dir_choose])
             process_thread.start()
         else:
             IHM['analyses']['button2']['widget_addr'].configure(state=tk.NORMAL)
@@ -441,9 +451,9 @@ class Clamav_pytkgui(Config, Clamav_utils):
             files_choose = tuple([os.sep.join(file_choose.split('/')) for file_choose in files_choose])   # Because of Windows '\' directory separator portability.
             self.rootterminal.deiconify()
             self.terminal.configure(state=tk.NORMAL)
-            self.terminal.delete("1.0", "end")
+            self.terminal.delete("1.0", tk.END)
             self.terminal.configure(state=tk.DISABLED)
-            process_thread = Thread(target=run_clamscan_files, name='T_run_clamscan_files', args=[self, self.confs['parameters']['clamscan_bin'], files_choose])
+            process_thread = Thread(target=run_clamscan_files, name='T_run_clamscan_files', args=[self, self.confs['parameters']['clamscan_bin'], self.confs['parameters']['clamscan_logs'], files_choose])
             process_thread.start()
         else:
             IHM['analyses']['button1']['widget_addr'].configure(state=tk.NORMAL)
@@ -493,8 +503,8 @@ class TerminalInfo(object):
         """
         """
         self.textbox.configure(state=tk.NORMAL)
-        self.textbox.insert("end", text)
-        self.textbox.see("end")
+        self.textbox.insert(tk.END, text)
+        self.textbox.see(tk.END)
         self.textbox.configure(state=tk.DISABLED)
 
     def flush(self):
@@ -503,21 +513,27 @@ class TerminalInfo(object):
         """
         pass
 
+def compute_clamscan_log_full(clamscan_logs):
+    """
+    """
+    d = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    return os.path.join(clamscan_logs, f"clamscan-{d}.log")
+
 def check_virus_db():
     """
     """
     cde_line = ['clamscan', '--version']
     rsl = subprocess.run(cde_line, capture_output=True)
-    date_last_db_virus = rsl.stdout.decode("utf-8").split("/")[2].strip()
-    date_last_db_virus = datetime.datetime.date(datetime.datetime.strptime(date_last_db_virus, "%c"))
+    date_last_db_virus = rsl.stdout.decode('utf-8').split("/")[2].strip()
+    date_last_db_virus = datetime.datetime.date(datetime.datetime.strptime(date_last_db_virus, '%c'))
     date_today = datetime.datetime.date(datetime.datetime.now())
     return (date_today - date_last_db_virus).days
 
-def run_clamscan_dir(tk_app, clamscan_bin, dir_to_scan):
+def run_clamscan_dir(tk_app, clamscan_bin, clamscan_logs, dir_to_scan):
     """
     """
-    cde_line = [clamscan_bin, dir_to_scan]
-
+    clamscan_logs_full = compute_clamscan_log_full(clamscan_logs)
+    cde_line = [clamscan_bin, '-l', clamscan_logs_full, dir_to_scan]
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
     with subprocess.Popen(cde_line, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True) as p:
@@ -526,10 +542,11 @@ def run_clamscan_dir(tk_app, clamscan_bin, dir_to_scan):
             print(line, end='')
     sys.stdout = sys.__stdout__
 
-def run_clamscan_files(tk_app, clamscan_bin, files_to_scan):
+def run_clamscan_files(tk_app, clamscan_bin, clamscan_logs, files_to_scan):
     """
     """
-    cde_line = [clamscan_bin]
+    clamscan_logs_full = compute_clamscan_log_full(clamscan_logs)
+    cde_line = [clamscan_bin, '-l', clamscan_logs_full]
     cde_line += files_to_scan
     terminalinfo = TerminalInfo(tk_app.terminal)
     sys.stdout = terminalinfo
