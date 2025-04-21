@@ -41,11 +41,12 @@ IHM = od([
                    ])),
 ('history', od([('framelabel', {'text': '', 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
-                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+#                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ('button3', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
 ('white_list', od([('framelabel', {'text': '', 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
+                   ('button2', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
                    ])),
 ('analyses', od([('framelabel', {'text': '', 'widget_addr': None}),
                    ('button1', {'text': '', 'image': '', 'command' : '', 'state': tk.DISABLED, 'widget_addr': None}),
@@ -66,11 +67,12 @@ labels = {
                             },
              'history': {'framelabel': "Historique",
                          'button1': 'Historique',
-                         'button2': 'Quarantaine',
+#                         'button2': 'Quarantaine',
                          'button3': "Chemin des logs",
                          },
              'white_list': {'framelabel': "Liste blanche",
                         'button1': "Choisir les fichiers à ne pas ananalyser",
+                        'button2': "Choisir les répertoires à ne pas ananalyser",
                         },
              'analyses': {'framelabel': "Analyses",
                           'button1': "Analyse d'un fichier",
@@ -90,11 +92,12 @@ labels = {
                             },
              'history': {'framelabel': "歴史",
                          'button1': '歴史',
-                         'button2': '隔離',
+#                         'button2': '隔離',
                          'button3': "ローグ道",
                          },
              'white_list': {'framelabel': "認可リスト",
                         'button1': "分析はしないファイルを選択",
+                        'button2': "分析はしないティレクトリーを選択",
                         },
              'analyses': {'framelabel': "分析",
                           'button1': "ファイル分析",
@@ -114,11 +117,12 @@ labels = {
                             },
              'history': {'framelabel': "History",
                          'button1': 'History',
-                         'button2': 'Quarantine',
+#                         'button2': 'Quarantine',
                          'button3': "Logs path",
                         },
              'white_list': {'framelabel': "White list",
                         'button1': "Choose file do not analysis",
+                        'button2': "Choose directories do not analysis",
                         },
              'analyses': {'framelabel': "Analyses",
                           'button1': "File Analysis",
@@ -272,9 +276,10 @@ class Clamav_pytkgui(Config, Clamav_utils):
         IHM['language']['button3']['command'] = self.on_Uk_btn
         IHM['clamscan_bin']['button1']['command'] = self.on_clamscan_bin_btn
         IHM['history']['button1']['command'] = self.on_history_btn
-        IHM['history']['button2']['command'] = None
+#        IHM['history']['button2']['command'] = None
         IHM['history']['button3']['command'] = self.on_history_clamscan_logs_btn
         IHM['white_list']['button1']['command'] = None
+        IHM['white_list']['button2']['command'] = None
         IHM['analyses']['button1']['command'] = self.on_analyses_file_btn
         IHM['analyses']['button2']['command'] = self.on_analyses_dir_btn
         IHM['quit']['button1']['command'] = self.terminate
